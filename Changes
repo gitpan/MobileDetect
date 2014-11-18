@@ -1,0 +1,6 @@
+Revision history for Perl extension MobileDetect.
+
+1.12  Tue Nov 18 22:36:33 2014
+	- original version; created by h2xs 1.23 with options
+		-AXc -n MobileDetect
+
