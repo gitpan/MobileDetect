@@ -18,7 +18,7 @@ use JSON;
 use LWP::Protocol::https;
 use LWP::UserAgent;
 
-our $VERSION 					= '1.13';
+our $VERSION 					= '1.14';
 use constant JSON_REMOTE_FILE 	=> 'https://raw.githubusercontent.com/serbanghita/Mobile-Detect/master/Mobile_Detect.json';
 use constant JSON_LOCAL_FILE 	=> '/var/tmp/Mobile_Detect.json';
 
@@ -155,42 +155,42 @@ sub is_mobile_ua(){
 =pod
 =head1 NAME
 
-MobileDetect - The great new MobileDetect Library for Perl is finally available!
-Perl Module for the PHP Toolchain Mobile Detect from https://github.com/serbanghita/Mobile-Detect .
-More Information and development Tools can be found here http://www.buzzerstar.com/development/ and http://www.buzzerstar.com/
+	MobileDetect - The great new MobileDetect Library for Perl is finally available!
+	Perl Module for the PHP Toolchain Mobile Detect from https://github.com/serbanghita/Mobile-Detect .
+	More Information and development Tools can be found here http://www.buzzerstar.com/development/ and http://www.buzzerstar.com/
 
-Feel free to download, modify or change to code to fullfill your needs.
+	Feel free to download, modify or change to code to fullfill your needs.
 
 =head1 VERSION
-Version 1.13
+	1.14
 
 =head2 DEPENDENCIE
 
-use strict;
-use warnings FATAL => 'all';
-use JSON;
-use Data::Dumper;
-use LWP::Protocol::https;
-use LWP::UserAgent;
+	use strict;
+	use warnings FATAL => 'all';
+	use JSON;
+	use Data::Dumper;
+	use LWP::Protocol::https;
+	use LWP::UserAgent;
 
 =head1 SYNOPSIS
 
-#!/usr/bin/perl
+	#!/usr/bin/perl
 
-use MobileDetect;
+	use MobileDetect;
 
-my $obj 	= MobileDetect->new(); 
-my $check 	= "Mozilla/5.0 (Linux; U; Android 4.1.2; nl-nl; SAMSUNG GT-I8190/I8190XXAME1 Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"; # Samsung Galaxy S3 Mini
+	my $obj 	= MobileDetect->new(); 
+	my $check 	= "Mozilla/5.0 (Linux; U; Android 4.1.2; nl-nl; SAMSUNG GT-I8190/I8190XXAME1 Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"; # Samsung Galaxy S3 Mini
 
-print "is_phone: 			".$obj->is_phone($check); print "\n";
-print "detect_phone: 		".$obj->detect_phone($check); print "\n";
-print "is_tablet: 			".$obj->is_tablet($check);print "\n";
-print "detect_tablet: 		".$obj->detect_tablet($check);print "\n";
+	print "is_phone: 			".$obj->is_phone($check); print "\n";
+	print "detect_phone: 		".$obj->detect_phone($check); print "\n";
+	print "is_tablet: 			".$obj->is_tablet($check);print "\n";
+	print "detect_tablet: 		".$obj->detect_tablet($check);print "\n";
 
-print "is_mobile_os: 		".$obj->is_mobile_os($check);print "\n";
-print "detect_mobile_os:	".$obj->detect_mobile_os($check);print "\n";
-print "is_mobile_ua: 		".$obj->is_mobile_ua($check);print "\n";
-print "detect_mobile_ua:	".$obj->detect_mobile_ua($check)."\n";
+	print "is_mobile_os: 		".$obj->is_mobile_os($check);print "\n";
+	print "detect_mobile_os:	".$obj->detect_mobile_os($check);print "\n";
+	print "is_mobile_ua: 		".$obj->is_mobile_ua($check);print "\n";
+	print "detect_mobile_ua:	".$obj->detect_mobile_ua($check)."\n";
 
 =head1 DESCRIPTION
 
@@ -199,22 +199,22 @@ I have prepared a Perl Version, because there is no such thing in perl and i als
 and his fine piece of PHP Software.
 
 This is the Perl Version. You need to setup LWP with HTTPS Support before (needed to regulary update the Mobile_Detect.json file
-from github).
+	from github).
 
-Install needed modules example:
-From the bash call :"cpan"
-cpan [1] Promt: call "install JSON"
-cpan [2] Promt: call "install JSON::XS"
-cpan [3] Promt: call "install LWP::Protocol"
-cpan [4] Promt: call "install LWP::Protocol::https"
+	Install needed modules example:
+	From the bash call :"cpan"
+	cpan [1] Promt: call "install JSON"
+	cpan [2] Promt: call "install JSON::XS"
+	cpan [3] Promt: call "install LWP::Protocol"
+	cpan [4] Promt: call "install LWP::Protocol::https"
 
 =head1 AUTHOR
 
-Sebastian Enger, C<< <sebastian.enger at gmail.com> >>
-L<Buzz News in Deutsch|http://www.buzzerstar.com/>
-L<Buzz Trending News auf BuzzerStar|http://www.buzzerstar.com/trending/>
-L<BuzzerStar Newsticker mit Bild und Text|http://www.buzzerstar.com/newsticker/>
-L<BuzzerStar Entertainment Neuigkeiten|http://www.buzzerstar.com/kategorie/Entertainment>
+	Sebastian Enger, C<< <sebastian.enger at gmail.com> >>
+	L<Buzz News in Deutsch|http://www.buzzerstar.com/>
+	L<Buzz Trending News auf BuzzerStar|http://www.buzzerstar.com/trending/>
+	L<BuzzerStar Newsticker mit Bild und Text|http://www.buzzerstar.com/newsticker/>
+	L<BuzzerStar Entertainment Neuigkeiten|http://www.buzzerstar.com/kategorie/Entertainment>
 
 
 =head1 BUGS

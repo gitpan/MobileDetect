@@ -8,4 +8,6 @@ Revision history for Perl extension MobileDetect.
 	- fixed some typos, better structure of MobileDetect.pm
 	- fixed some code, removed debug statements
 
+1.14 Wed Nov 19 12:52 2014
+	- beautifies pod output
 
