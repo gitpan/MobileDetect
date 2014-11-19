@@ -18,7 +18,7 @@ use JSON;
 use LWP::Protocol::https;
 use LWP::UserAgent;
 
-our $VERSION 					= '1.12';
+our $VERSION 					= '1.13';
 use constant JSON_REMOTE_FILE 	=> 'https://raw.githubusercontent.com/serbanghita/Mobile-Detect/master/Mobile_Detect.json';
 use constant JSON_LOCAL_FILE 	=> '/var/tmp/Mobile_Detect.json';
 
