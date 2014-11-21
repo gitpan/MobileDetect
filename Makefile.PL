@@ -19,10 +19,11 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'JSON' 					=> 1.0,
-		'JSON::XS' 				=> 1.0,
 		'LWP::Protocol::https'	=> 1.0,
 		'LWP::Protocol'			=> 1.0,
+		'Storable'				=> 1.0,
+		
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'MobileDetect-PP-*' },
+    clean => { FILES => 'MobileDetect*' },
 );

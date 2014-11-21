@@ -13,14 +13,18 @@ package MobileDetect;
 #
 use 5.006;
 use strict;
+no strict "subs";
 use warnings FATAL => 'all';
+no warnings qw/misc/;
 use JSON;
 use LWP::Protocol::https;
 use LWP::UserAgent;
+use Storable;
 
-our $VERSION 					= '1.14';
+our $VERSION 					= '1.15';
 use constant JSON_REMOTE_FILE 	=> 'https://raw.githubusercontent.com/serbanghita/Mobile-Detect/master/Mobile_Detect.json';
 use constant JSON_LOCAL_FILE 	=> '/var/tmp/Mobile_Detect.json';
+use constant HASH_LOCAL_FILE 	=> '/var/tmp/Mobile_Detect.db';
 
 our @EXPORT = qw(is_phone is_tablet is_mobile_os is_mobile_ua detect_phone detect_tablet detect_mobile_os detect_mobile_ua);
 
@@ -28,39 +32,55 @@ sub new {
 	my($class, %args) = @_;
 	my $self 		= bless({}, $class);
 	my $json 		= JSON->new();
-	my $content 	= "";
-	my $filestamp 	= -M JSON_LOCAL_FILE; 
+	my $filestamp	= 0;
+	my $filesize	= 0; 
+	my %hashfile;
+	my $hash;
 	
-	if ( (defined($filestamp) && $filestamp > 31) || !-e JSON_LOCAL_FILE ){
-		unlink JSON_LOCAL_FILE;
-	
-		my $ua = LWP::UserAgent->new(ssl_opts => { verify_hostname => 0 });
-		my $res = $ua->get(JSON_REMOTE_FILE);
-
-		open my $handle, '>:encoding(UTF-8)', JSON_LOCAL_FILE or die "Can't open ".JSON_LOCAL_FILE." for reading: $!";
-			print $handle $res->content;
-		close $handle;
-		$content = $res->content;
-	} else {
-		open my $handle, '<:encoding(UTF-8)', JSON_LOCAL_FILE or die "Can't open ".JSON_LOCAL_FILE." for reading: $!";
-			local $/ = undef;
-			$content = <$handle>;
-		close $handle;
+	if (-e HASH_LOCAL_FILE && -f HASH_LOCAL_FILE){
+		$filestamp	= -M HASH_LOCAL_FILE;
+		$filestamp	= int($filestamp);
+		$filesize	= -s HASH_LOCAL_FILE; 
 	}
-	my $json_text = $json->allow_nonref->utf8->relaxed->decode($content);
+		 	
+	# if we have a filestamp a file that has been created 31 days before
+	# AND we have a filesize of the file of lower than 1000 bytes we have to download and parse the json file
+	if ( $filestamp > 31 && $filesize < 1000 ){ 
+	#	print "just downloading json content and fix it to hash content\n";
+		
+		unlink JSON_LOCAL_FILE; 
+		unlink HASH_LOCAL_FILE;
 	
-	while (my($k, $v) = each (%{$json_text->{uaMatch}->{tablets}})){
-		$self->{tablets}->{$k} = $v;
-    }
-	while (my($k, $v) = each (%{$json_text->{uaMatch}->{phones}})){
-		$self->{phones}->{$k} = $v;
-    } 
-	while (my($k, $v) = each (%{$json_text->{uaMatch}->{browsers}})){
-		$self->{browsers}->{$k} = $v;
-    }
-	while (my($k, $v) = each (%{$json_text->{uaMatch}->{os}})){
-		$self->{os}->{$k} = $v;
-    }
+		my $ua 				= LWP::UserAgent->new();
+		my $res 			= $ua->get(JSON_REMOTE_FILE);
+		my $json_content 	= "";
+		if ($res->is_success) {
+			 $json_content 	= $res->content;
+		 } else {
+			 die "Cannot download JSON RAW File From Github - exiting." . $res->status_line;
+		 }
+		my $json_text 		= $json->allow_nonref->utf8->relaxed->decode($json_content);
+		
+		while (my($k, $v) = each (%{$json_text->{uaMatch}->{tablets}})){
+			$hash->{tablets}->{$k} = $v;
+		}
+		while (my($k, $v) = each (%{$json_text->{uaMatch}->{phones}})){
+			$hash->{phones}->{$k} = $v;
+		} 
+		while (my($k, $v) = each (%{$json_text->{uaMatch}->{browsers}})){
+			$hash->{browsers}->{$k} = $v;
+		}
+		while (my($k, $v) = each (%{$json_text->{uaMatch}->{os}})){
+			$hash->{os}->{$k} = $v;
+		}
+		$self->{json}=$hash;	
+		my %hashfile = %{$hash};
+		Storable::store(\%hashfile, HASH_LOCAL_FILE) or die "Can't store %hash in ".HASH_LOCAL_FILE." !\n";
+	} else {
+	#	print "just reading hash content\n";
+		$hash = Storable::retrieve(HASH_LOCAL_FILE);
+		$self->{json}=$hash;
+	}
 	return $self;
 }
 
@@ -68,7 +88,7 @@ sub detect_phone(){
 	my $self 	= shift;
 	my $str 	= shift;
 	my $retVal  = 0;
-	while (my($k1, $v1) = each (%{$self->{phones}})){
+	while (my($k1, $v1) = each (%{$self->{json}->{phones}})){
 		if ($str =~ m/$v1/igs){
 			$retVal = $k1;
 		}
@@ -80,7 +100,7 @@ sub detect_tablet(){
 	my $str 	= shift;
 	
 	my $retVal  = 0;
-	while (my($k2, $v2) = each (%{$self->{tablets}})){
+	while (my($k2, $v2) = each (%{$self->{json}->{tablets}})){
 		if ($str =~ m/$v2/igs){
 			$retVal = $k2;
 		} 
@@ -92,7 +112,7 @@ sub detect_mobile_os(){
 	my $str 	= shift;
 	
 	my $retVal  = 0;
-	while (my($k3, $v3) = each (%{$self->{os}})){
+	while (my($k3, $v3) = each (%{$self->{json}->{os}})){
 		if ($str =~ m/$v3/igs){
 			$retVal = $k3;
 		} 
@@ -104,7 +124,7 @@ sub detect_mobile_ua(){
 	my $str 	= shift;
 
 	my $retVal  = 0;
-	while (my($k4, $v4) = each (%{$self->{browsers}})){
+	while (my($k4, $v4) = each (%{$self->{json}->{browsers}})){
 		if ($str =~ m/$v4/igs){
 			$retVal = $k4;
 		}
@@ -151,7 +171,6 @@ sub is_mobile_ua(){
 	}
 }
 
-
 =pod
 =head1 NAME
 
@@ -162,16 +181,14 @@ sub is_mobile_ua(){
 	Feel free to download, modify or change to code to fullfill your needs.
 
 =head1 VERSION
-	1.14
-
+	1.15
 =head2 DEPENDENCIE
 
 	use strict;
-	use warnings FATAL => 'all';
 	use JSON;
-	use Data::Dumper;
 	use LWP::Protocol::https;
 	use LWP::UserAgent;
+	use Storable;
 
 =head1 SYNOPSIS
 
@@ -198,6 +215,9 @@ Check a given string against the Mobile Detect Library that can be found here: h
 I have prepared a Perl Version, because there is no such thing in perl and i also want to show my support for Mr. Șerban Ghiță
 and his fine piece of PHP Software.
 
+The newest Version 1.15 has build in flat file database support, where the content of the downloaded json file is being preparsed
+and can be read into memory with the needed hash structure for perl to process. 
+
 This is the Perl Version. You need to setup LWP with HTTPS Support before (needed to regulary update the Mobile_Detect.json file
 	from github).
 
@@ -207,7 +227,8 @@ This is the Perl Version. You need to setup LWP with HTTPS Support before (neede
 	cpan [2] Promt: call "install JSON::XS"
 	cpan [3] Promt: call "install LWP::Protocol"
 	cpan [4] Promt: call "install LWP::Protocol::https"
-
+	cpan [5] Promt: call "install Storable"
+	
 =head1 AUTHOR
 
 	Sebastian Enger, C<< <sebastian.enger at gmail.com> >>
@@ -215,7 +236,6 @@ This is the Perl Version. You need to setup LWP with HTTPS Support before (neede
 	L<Buzz Trending News auf BuzzerStar|http://www.buzzerstar.com/trending/>
 	L<BuzzerStar Newsticker mit Bild und Text|http://www.buzzerstar.com/newsticker/>
 	L<BuzzerStar Entertainment Neuigkeiten|http://www.buzzerstar.com/kategorie/Entertainment>
-
 
 =head1 BUGS
 

@@ -22,9 +22,9 @@ DEPENDENCIES
 This module requires these other modules and libraries:
 
 use JSON;
-use Data::Dumper;
 use LWP::Protocol::https;
 use LWP::UserAgent;
+use Storable;
 
 COPYRIGHT AND LICENCE
 
