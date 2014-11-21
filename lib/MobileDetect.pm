@@ -21,7 +21,7 @@ use LWP::Protocol::https;
 use LWP::UserAgent;
 use Storable;
 
-our $VERSION 					= '1.15';
+our $VERSION 					= '1.16';
 use constant JSON_REMOTE_FILE 	=> 'https://raw.githubusercontent.com/serbanghita/Mobile-Detect/master/Mobile_Detect.json';
 use constant JSON_LOCAL_FILE 	=> '/var/tmp/Mobile_Detect.json';
 use constant HASH_LOCAL_FILE 	=> '/var/tmp/Mobile_Detect.db';
@@ -181,8 +181,10 @@ sub is_mobile_ua(){
 	Feel free to download, modify or change to code to fullfill your needs.
 
 =head1 VERSION
-	1.15
-=head2 DEPENDENCIE
+	
+	1.16
+	
+=head1 DEPENDENCIE
 
 	use strict;
 	use JSON;
